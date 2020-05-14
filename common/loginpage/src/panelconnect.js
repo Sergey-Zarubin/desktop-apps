@@ -110,6 +110,14 @@
                                                 <svg class='icon'><use xlink:href='#logo__owncloud'></svg>
                                             </button>
                                         </div>
+                                        <div style='font-size:0;'>
+                                            <button class="btn btn--big btn--light btn--svg login" data-cprov='seafile'>
+                                                <svg class='icon'><use xlink:href='#logo__seafile'></svg>
+                                            </button>
+                                            <button class="btn btn--big btn--light btn--svg login" data-cprov='infomaniak'>
+                                                <svg class='icon'><use xlink:href='#logo__infomaniak'></svg>
+                                            </button>
+                                        </div>
                                     </section>
                                     <h4 class='text-description separate-top' style='margin-bottom:8px;' l10n>${_lang.portalEmptyAdv1}</h4>
                                     <div class="tools-connect">
