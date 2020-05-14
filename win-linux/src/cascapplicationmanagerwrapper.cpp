@@ -348,6 +348,19 @@ bool CAscApplicationManagerWrapper::processCommonEvent(NSEditorApi::CAscCefMenuE
             topWindow()->mainPanel()->createLocalFile(AscAppManager::newFileName(_f), _f);
             return true;
         }
+        else
+        if ( cmd.compare(L"open:document") == 0 ) {
+            wstring _url = pData->get_Param();
+            if ( !_url.empty() ) {
+                CCefView * _view = GetViewByUrl(_url);
+                int _id = _view ? _view->GetId() : -1;
+                if ( _url.rfind(L"http://",0) == 0 || _url.rfind(L"https://",0) == 0 ) {
+                    topWindow()->mainPanel()->onCloudDocumentOpen(_url, _id, true);
+                } else {
+                    /* open local file */
+                }
+            }
+        }
 
         break; }
 
