@@ -30,5 +30,26 @@
             }
         },
         "cryptoSupport" : "true"
+    },
+    {
+        "id": "kdrive",
+        "name" : "Infomaniak",
+        "editorPage" : "/app/office/",
+        "check": {
+            "url": "status.php",
+            "headers": {
+                "OCS-APIREQUEST":"true"
+            }
+        },
+        "cryptoSupport" : "true"
+    },
+    {
+        "id": "seafile",
+        "name" : "Seafile",
+        "check" : {
+            "url": "/api2/server-info/"
+        },
+        "editorPage" : "/lib/",
+        "cryptoSupport" : "true"
     }
 ]

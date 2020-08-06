@@ -114,7 +114,7 @@
                                             <button class="btn btn--big btn--light btn--svg login" data-cprov='seafile'>
                                                 <svg class='icon'><use xlink:href='#logo__seafile'></svg>
                                             </button>
-                                            <button class="btn btn--big btn--light btn--svg login" data-cprov='infomaniak'>
+                                            <button class="btn btn--big btn--light btn--svg login" data-cprov='kdrive'>
                                                 <svg class='icon'><use xlink:href='#logo__kdrive'></svg>
                                             </button>
                                         </div>
