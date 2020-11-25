@@ -15,7 +15,7 @@ SUPPORT_MAIL ?= support@onlyoffice.com
 PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 PACKAGE_EDITION ?= cool
-S3_BUCKET ?= repo-doc-onlyoffice-com
+S3_BUCKET ?= deploytest-static.teamlab.com
 
 BRANDING_DIR ?= $(PWD)/branding
 
@@ -358,8 +358,10 @@ deploy-rpm: $(RPM)
 	cp -rv $(RPM) $(RPM_REPO);
 	createrepo -v $(RPM_REPO);
 
-	@echo aws s3 sync $(RPM_REPO) s3://$(S3_BUCKET)/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(RPM_ARCH)/ --acl public-read --delete
-	@echo aws s3 sync $(RPM_REPO) s3://$(S3_BUCKET)/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/$(RPM_ARCH)/ --acl public-read --delete
+	aws s3 sync $(RPM_REPO) s3://$(S3_BUCKET)/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(RPM_ARCH)/ --acl public-read --delete
+	aws s3 sync $(RPM_REPO) s3://$(S3_BUCKET)/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/$(RPM_ARCH)/ --acl public-read --delete
+
+	aws s3 cp s://$(S3_BUCKET)/$(RPM_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(RPM_ARCH)/$(notdir $(RPM)) s3://$(S3_BUCKET)/packages/rpm/ --acl public-read
 
 deploy-deb: $(DEB)
 	rm -rfv $(DEB_REPO)
@@ -368,8 +370,10 @@ deploy-deb: $(DEB)
 	cp -rv $(DEB) $(DEB_REPO);
 	dpkg-scanpackages -m $(REPO_NAME) /dev/null | gzip -9c > $(DEB_REPO)/Packages.gz
 
-	@echo aws s3 sync $(DEB_REPO) s3://$(S3_BUCKET)/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(DEB_ARCH)/$(REPO_NAME) --acl public-read --delete
-	@echo aws s3 sync $(DEB_REPO) s3://$(S3_BUCKET)/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/$(DEB_ARCH)/$(REPO_NAME) --acl public-read --delete
+	aws s3 sync $(DEB_REPO) s3://$(S3_BUCKET)/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(DEB_ARCH)/$(REPO_NAME) --acl public-read --delete
+	aws s3 sync $(DEB_REPO) s3://$(S3_BUCKET)/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/$(DEB_ARCH)/$(REPO_NAME) --acl public-read --delete
+
+	aws s3 cp s://$(S3_BUCKET)/$(DEB_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(DEB_ARCH)/$(REPO_NAME)/$(notdir $(DEB)) s3://$(S3_BUCKET)/packages/deb/ --acl public-read
 
 deploy-deb-astra: $(DEB_ASTRA)
 	rm -rfv $(DEB_ASTRA_REPO)
