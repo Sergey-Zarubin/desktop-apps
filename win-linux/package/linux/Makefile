@@ -351,17 +351,22 @@ endif
 $(INSTALLER): $(INSTALLER_DEPENDENCY)
 	cd qt-installer && ./make-install.sh
 
+REPO_BRANCH := testing
+
 deploy-rpm: $(RPM)
 	rm -rfv $(RPM_REPO)
 	mkdir -p $(RPM_REPO)
 
-	cp -rv $(RPM) $(RPM_REPO);
-	createrepo -v $(RPM_REPO);
+	cp -rv $(RPM) $(RPM_REPO)
+	createrepo -v $(RPM_REPO)
 
-	aws s3 sync $(RPM_REPO) s3://$(S3_BUCKET)/release/v$(PACKAGE_VERSION)/$(RPM_REPO_DIR)/$(RPM_ARCH)/ --acl public-read --delete
-	aws s3 sync $(RPM_REPO) s3://$(S3_BUCKET)/release/latest/$(RPM_REPO_DIR)/$(RPM_ARCH)/ --acl public-read --delete
+	aws s3 sync --acl public-read --delete \
+		$(RPM_REPO) \
+		s3://$(S3_BUCKET)/uploads/$(REPO_BRANCH)/$(PACKAGE_VERSION)/$(RPM_REPO_DIR)/$(RPM_ARCH)
 
-	aws s3 cp s3://$(S3_BUCKET)/release/v$(PACKAGE_VERSION)/$(RPM_REPO_DIR)/$(RPM_ARCH)/$(notdir $(RPM)) s3://$(S3_BUCKET)/packages/rpm/ --acl public-read
+	aws s3 cp --acl public-read \
+		s3://$(S3_BUCKET)/uploads/$(REPO_BRANCH)/$(PACKAGE_VERSION)/$(RPM_REPO_DIR)/$(RPM_ARCH)/$(notdir $(RPM)) \
+		s3://$(S3_BUCKET)/packages/$(REPO_BRANCH)/rpm/
 
 deploy-deb: $(DEB)
 	rm -rfv $(DEB_REPO)
@@ -370,10 +375,13 @@ deploy-deb: $(DEB)
 	cp -rv $(DEB) $(DEB_REPO);
 	dpkg-scanpackages -m $(REPO_NAME) /dev/null | gzip -9c > $(DEB_REPO)/Packages.gz
 
-	aws s3 sync $(DEB_REPO) s3://$(S3_BUCKET)/release/v$(PACKAGE_VERSION)/$(DEB_REPO_DIR)/$(DEB_ARCH)/$(REPO_NAME) --acl public-read --delete
-	aws s3 sync $(DEB_REPO) s3://$(S3_BUCKET)/release/latest/$(DEB_REPO_DIR)/$(DEB_ARCH)/$(REPO_NAME) --acl public-read --delete
+	aws s3 sync --acl public-read --delete \
+		$(DEB_REPO) \
+		s3://$(S3_BUCKET)/uploads/$(REPO_BRANCH)/$(PACKAGE_VERSION)/$(DEB_REPO_DIR)/$(DEB_ARCH)/$(REPO_NAME)
 
-	aws s3 cp s3://$(S3_BUCKET)/release/v$(PACKAGE_VERSION)/$(DEB_REPO_DIR)/$(DEB_ARCH)/$(REPO_NAME)/$(notdir $(DEB)) s3://$(S3_BUCKET)/packages/deb/ --acl public-read
+	aws s3 cp --acl public-read \
+		s3://$(S3_BUCKET)/uploads/$(REPO_BRANCH)/$(PACKAGE_VERSION)/$(DEB_REPO_DIR)/$(DEB_ARCH)/$(REPO_NAME)/$(notdir $(DEB)) \
+		s3://$(S3_BUCKET)/packages/$(REPO_BRANCH)/deb/
 
 deploy-deb-astra: $(DEB_ASTRA)
 	rm -rfv $(DEB_ASTRA_REPO)
