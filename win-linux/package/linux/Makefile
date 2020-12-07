@@ -354,87 +354,28 @@ $(INSTALLER): $(INSTALLER_DEPENDENCY)
 REPO_BRANCH := testing
 
 deploy-rpm: $(RPM)
-	rm -rfv $(RPM_REPO)
-	mkdir -p $(RPM_REPO)
-
-	cp -rv $(RPM) $(RPM_REPO)
-	createrepo -v $(RPM_REPO)
-
-	aws s3 sync --acl public-read --delete \
-		$(RPM_REPO) \
-		s3://$(S3_BUCKET)/uploads/$(REPO_BRANCH)/$(PACKAGE_VERSION)/$(RPM_REPO_DIR)/$(RPM_ARCH)
-
-	aws s3 cp --acl public-read \
-		s3://$(S3_BUCKET)/uploads/$(REPO_BRANCH)/$(PACKAGE_VERSION)/$(RPM_REPO_DIR)/$(RPM_ARCH)/$(notdir $(RPM)) \
-		s3://$(S3_BUCKET)/packages/$(REPO_BRANCH)/rpm/
+	aws s3 cp --no-progress --acl public-read \
+		$< s3://$(S3_BUCKET)/uploads/rpm/$(REPO_BRANCH)/
 
 deploy-deb: $(DEB)
-	rm -rfv $(DEB_REPO)
-	mkdir -p $(DEB_REPO)
-
-	cp -rv $(DEB) $(DEB_REPO);
-	dpkg-scanpackages -m $(REPO_NAME) /dev/null | gzip -9c > $(DEB_REPO)/Packages.gz
-
-	aws s3 sync --acl public-read --delete \
-		$(DEB_REPO) \
-		s3://$(S3_BUCKET)/uploads/$(REPO_BRANCH)/$(PACKAGE_VERSION)/$(DEB_REPO_DIR)/$(DEB_ARCH)/$(REPO_NAME)
-
-	aws s3 cp --acl public-read \
-		s3://$(S3_BUCKET)/uploads/$(REPO_BRANCH)/$(PACKAGE_VERSION)/$(DEB_REPO_DIR)/$(DEB_ARCH)/$(REPO_NAME)/$(notdir $(DEB)) \
-		s3://$(S3_BUCKET)/packages/$(REPO_BRANCH)/deb/
+	aws s3 cp --no-progress --acl public-read \
+		$< s3://$(S3_BUCKET)/uploads/deb/$(REPO_BRANCH)/
 
 deploy-deb-astra: $(DEB_ASTRA)
-	rm -rfv $(DEB_ASTRA_REPO)
-	mkdir -p $(DEB_ASTRA_REPO)
-
-	cp -rv $(DEB_ASTRA) $(DEB_ASTRA_REPO);
-	dpkg-scanpackages -m $(DEB_ASTRA_REPO) /dev/null | gzip -9c > $(DEB_ASTRA_REPO)/Packages.gz
-
-	@echo aws s3 sync $(DEB_ASTRA_REPO) s3://$(S3_BUCKET)/$(DEB_ASTRA_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(DEB_ARCH)/$(REPO_NAME) --acl public-read --delete
-	@echo aws s3 sync $(DEB_REPO) s3://$(S3_BUCKET)/$(DEB_ASTRA_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/$(DEB_ARCH)/$(REPO_NAME) --acl public-read --delete
+	aws s3 cp --no-progress --acl public-read \
+		$< s3://$(S3_BUCKET)/uploads/deb-astra/$(REPO_BRANCH)/
 
 deploy-apt-rpm: $(APT_RPM)
-	rm -rfv $(APT_RPM_REPO)
-	mkdir -p $(APT_RPM_REPO)
-	
-	cp -rv $(APT_RPM) $(APT_RPM_REPO);
-	#createrepo -v $(APT_RPM_REPO);
-	
-	#for i in i586 i686 x86_64 noarch; do \
-	#	mkdir -p "$(URPMI_REPO)/$$i/base" "$(REPO)/$$i/RPMS.$(REPO_NAME)" ; \
-	#done
-
-	#cp -rv $(APT_RPM) $(URPMI_REPO)/$(APT_RPM_ARCH)/RPMS.$(REPO_NAME);
-
-	#genbasedir --topdir=$(URPMI_REPO) $(APT_RPM_ARCH) $(REPO_NAME)
-
-	@echo aws s3 sync $(APT_RPM_REPO) s3://$(S3_BUCKET)/$(ALT_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(APT_RPM_ARCH)/ --acl public-read --delete
-	@echo aws s3 sync $(APT_RPM_REPO) s3://$(S3_BUCKET)/$(ALT_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/$(APT_RPM_ARCH)/ --acl public-read --delete
+	aws s3 cp --no-progress --acl public-read \
+		$< s3://$(S3_BUCKET)/uploads/apt-rpm/$(REPO_BRANCH)/
 
 deploy-urpmi: $(URPMI)
-	rm -rfv $(URPMI_REPO)
-	mkdir -p $(URPMI_REPO)
-
-	
-	cp -rv $(URPMI) $(URPMI_REPO);
-	#createrepo -v $(URPMI_REPO);
-
-	#for i in i586 i686 x86_64 noarch; do \
-	#	mkdir -p "$(URPMI_REPO)/$$i/base" "$(REPO)/$$i/RPMS.$(REPO_NAME)" ; \
-	#done
-
-	#cp -rv $(URPMI) $(URPMI_REPO)/$(URPMI_ARCH)/RPMS.$(REPO_NAME);
-
-	#genbasedir --topdir=$(URPMI_REPO) $(URPMI_ARCH) $(REPO_NAME)
-
-	@echo aws s3 sync $(URPMI_REPO) s3://$(S3_BUCKET)/$(ROSA_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(URPMI_ARCH)/ --acl public-read --delete
-	@echo aws s3 sync $(URPMI_REPO) s3://$(S3_BUCKET)/$(ROSA_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/latest/$(URPMI_ARCH)/ --acl public-read --delete
+	aws s3 cp --no-progress --acl public-read \
+		$< s3://$(S3_BUCKET)/uploads/urpmi/$(REPO_BRANCH)/
 
 deploy-tar: $(TAR)
-	@echo aws s3 cp $(TAR) s3://$(S3_BUCKET)/$(OTHER_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(TAR_ARCH)/ --acl public-read
-
-deploy-installer: $(INSTALLER)
-	@echo aws s3 cp $(INSTALLER) s3://$(S3_BUCKET)/$(OTHER_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(TAR_ARCH)/ --acl public-read       
+	aws s3 cp --no-progress --acl public-read \
+		$< s3://$(S3_BUCKET)/$(OTHER_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(TAR_ARCH)/
 
 M4_PARAMS += -D M4_S3_BUCKET=$(S3_BUCKET)
 M4_PARAMS += -D M4_APT_RPM_URI="$(ALT_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(APT_RPM_ARCH)/$(notdir $(APT_RPM))"
