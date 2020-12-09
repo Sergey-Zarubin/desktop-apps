@@ -16,6 +16,7 @@ PRODUCT_VERSION ?= 0.0.0
 BUILD_NUMBER ?= 0
 PACKAGE_EDITION ?= cool
 S3_BUCKET ?= deploytest-static.teamlab.com
+REPO_BRANCH ?= unstable
 
 BRANDING_DIR ?= $(PWD)/branding
 
@@ -121,6 +122,11 @@ APT_RPM = $(APT_RPM_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(APT_RPM_AR
 URPMI = $(URPMI_PACKAGE_DIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).$(URPMI_ARCH).rpm
 DEB = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)_$(DEB_ARCH).deb
 DEB_ASTRA = $(DEB_PACKAGE_DIR)/$(PACKAGE_NAME)_$(PACKAGE_VERSION)-astra_$(DEB_ARCH).deb
+
+RPM_URI := packages/$(COMPANY_NAME_LOW)-$(REPO_BRANCH)/centos/$(notdir $(RPM))
+DEB_URI := packages/$(COMPANY_NAME_LOW)-$(REPO_BRANCH)/ubuntu/$(notdir $(DEB))
+APT_RPM_URI := packages/$(COMPANY_NAME_LOW)-$(REPO_BRANCH)/altlinux/$(notdir $(APT_RPM))
+URPMI_URI := packages/$(COMPANY_NAME_LOW)-$(REPO_BRANCH)/rosa/$(notdir $(URPMI))
 
 ifeq ($(COMPANY_NAME), ONLYOFFICE)
 	DESKTOPEDITORS_PREFIX := $(COMPANY_NAME_LOW)/$(PRODUCT_NAME_LOW)
@@ -351,31 +357,25 @@ endif
 $(INSTALLER): $(INSTALLER_DEPENDENCY)
 	cd qt-installer && ./make-install.sh
 
-REPO_BRANCH := testing
-
 deploy-rpm: $(RPM)
 	aws s3 cp --no-progress --acl public-read \
-		$< s3://$(S3_BUCKET)/uploads/rpm/$(REPO_BRANCH)/
+		$(RPM) s3://$(S3_BUCKET)/$(RPM_URI)
 
 deploy-deb: $(DEB)
 	aws s3 cp --no-progress --acl public-read \
-		$< s3://$(S3_BUCKET)/uploads/deb/$(REPO_BRANCH)/
-
-deploy-deb-astra: $(DEB_ASTRA)
-	aws s3 cp --no-progress --acl public-read \
-		$< s3://$(S3_BUCKET)/uploads/deb-astra/$(REPO_BRANCH)/
+		$(DEB) s3://$(S3_BUCKET)/$(DEB_URI)
 
 deploy-apt-rpm: $(APT_RPM)
 	aws s3 cp --no-progress --acl public-read \
-		$< s3://$(S3_BUCKET)/uploads/apt-rpm/$(REPO_BRANCH)/
+		$(APT_RPM) s3://$(S3_BUCKET)/$(APT_RPM_URI)
 
 deploy-urpmi: $(URPMI)
 	aws s3 cp --no-progress --acl public-read \
-		$< s3://$(S3_BUCKET)/uploads/urpmi/$(REPO_BRANCH)/
+		$(URPMI) s3://$(S3_BUCKET)/$(URPMI_URI)
 
 deploy-tar: $(TAR)
 	aws s3 cp --no-progress --acl public-read \
-		$< s3://$(S3_BUCKET)/$(OTHER_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(TAR_ARCH)/
+		$(TAR) s3://$(S3_BUCKET)/$(TAR_URI)
 
 M4_PARAMS += -D M4_S3_BUCKET=$(S3_BUCKET)
 M4_PARAMS += -D M4_APT_RPM_URI="$(ALT_REPO_DIR)/$(PACKAGE_NAME)/$(SVN_TAG)/$(PACKAGE_VERSION)/$(APT_RPM_ARCH)/$(notdir $(APT_RPM))"
